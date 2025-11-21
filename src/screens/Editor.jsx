@@ -10,6 +10,24 @@ export default function Editor() {
             <KeyboardAvoidingView  style={styles.keyboardWrapper} behavior={Platform.OS === "ios" ? "padding" : "height"} >
 
                     <View style={styles.content}>
+                        <View style={styles.headerContent}>
+                            <View style={styles.headerLeft}>
+                                <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={() => console.log("Go back")}/>
+
+                                <View>
+                                    <Text style={styles.title}>Крутая книга</Text>
+                                    <Text style={styles.subtitle}>Глава 3: крутость но тупость</Text>
+                                    <Text style={styles.infoTitle}>12 слов | До цели: 200 слов</Text>
+                                </View>
+                            </View>
+
+                            <PrimaryButton btnText={"..."} variant={"menu-burger"} menuItems={[{ label: 'Добавить комментарий', onPress: () => console.log('Бургер коментарий') }, { label: 'Моно', onPress: () => console.log('Бургер моно') }, { label: 'Темный', onPress: () => console.log('Бургер темный') }, { label: 'Читать', onPress: () => console.log('Бургер читать') },]} btnWidth={"11%"} onPress={() => console.log("Menu")}/>
+                        </View>
+
+
+
+
+
                         <TextInput placeholder="Начните творить здесь..." multiline textAlignVertical="top" style={styles.input}></TextInput>
 
                         <View style={styles.actionsContainer}>
@@ -50,18 +68,44 @@ const styles = StyleSheet.create({
 
         padding: 5,
     },
-    title: {
-        fontSize: 22,
-        fontWeight: "bold",
-    },
     input: {
         flex: 1,
         margin: 12,
         letterSpacing: 1,
         fontSize: 12,
-        borderColor: "#a6a6a6",
+        borderColor: "#dcdcdc",
         borderWidth: 1,
         padding: 10,
         backgroundColor: "#ffffff",
     },
+
+
+    headerContent: {
+        gap: 10,
+        height: 70,
+        padding: 2,
+        flexDirection: "row",
+    },
+    headerLeft: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+    },
+    title: {
+        fontSize: 19,
+        fontWeight: "bold",
+        marginBottom: 3,
+    },
+    subtitle: {
+        fontSize: 16,
+    },
+    infoTitle: {
+        fontSize: 13,
+        color: "#a5a5a5",
+        fontStyle: "italic",
+    },
+
+
+
 });
