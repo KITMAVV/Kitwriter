@@ -33,7 +33,6 @@ export default function Editor() {
                         <View style={styles.actionsContainer}>
                             <PrimaryButton btnText={"↶"} onPress={() => console.log("Fuc")}/>
                             <PrimaryButton btnText={"↷"} onPress={() => console.log("Fuc")}/>
-                            <PrimaryButton btnText={"Type ▼"} variant={"menu"} menuItems={[{ label: 'H1', onPress: () => console.log('H1') }, { label: 'H2', onPress: () => console.log('H2') }, { label: 'Абзац', onPress: () => console.log('abzts') },]} onPress={() => console.log("Fuc")}/>
                             <PrimaryButton btnText={"B"} onPress={() => console.log("Fuc")}/>
                             <PrimaryButton btnText={"I"} onPress={() => console.log("Fuc")}/>
 
@@ -73,7 +72,7 @@ const styles = StyleSheet.create({
         margin: 12,
         letterSpacing: 1,
         fontSize: 12,
-        borderColor: "#dcdcdc",
+        borderColor: "#f8f8f8",
         borderWidth: 1,
         padding: 10,
         backgroundColor: "#ffffff",

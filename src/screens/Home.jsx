@@ -9,32 +9,40 @@ import {
     FlatList,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
+import React, {useEffect, useState} from "react";
 
 import BookCard from "../components/Cards";
+import { getAllBooks, createBook } from "../repositories/booksRepository";
 
 
-const files = [
-    {
-        id: "1",
-        name: "Цікава книга",
-        description: "Дуже цікава",
-        uri: null,
-    },
-    {
-        id: "2",
-        name: "Цікава книга 2",
-        description: "Не дуже цікава",
-        uri: null,
-    },
-    {
-        id: "3",
-        name: "Цікава книга 3",
-        description: "Не цікава",
-        uri: null,
-    },
-];
 
 export default function Home({navigation}) {
+    
+    const [books, setBooks] = useState([]);
+
+    async function loadBooks() {
+        const data = await getAllBooks();
+            setBooks(data);
+            console.log(data);
+    }
+
+    useEffect(() =>{
+        loadBooks();
+    }, []);
+
+    
+
+    async function handleCreateBook() {
+        const book = await createBook({
+            book_name: "Без Названия"
+        });
+        await loadBooks();
+    }
+
+    
+
+
+
     return (
         <SafeAreaView style={styles.container}>
 
@@ -43,15 +51,23 @@ export default function Home({navigation}) {
 
                 <View style={styles.cardsFlatListWrap}>
                     <FlatList
-                        data={files}
+                        data={books}
                         horizontal
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item.id.toString()}
                         renderItem={({item}) => (
-                            <BookCard title={item.name} description={item.description} imgUri={item.uri}
+                            <BookCard title={item.book_name} description={item.description} imgUri={item.cover_image}
                                       onPress={() => console.log("Opening file", item)}/>
                         )}
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.cardsFlatListContent}
+                        contentContainerStyle={[styles.cardsFlatListContent,  books.length === 0 && styles.emptyListContent]}
+
+                        ListEmptyComponent={
+                            <View style={styles.cardsEmptyWrap}>
+                                <Text>
+                                    Начните творить сейчас
+                                </Text>
+                            </View>
+                        }
                     />
                 </View>
 
@@ -60,16 +76,11 @@ export default function Home({navigation}) {
                     <BookCard title="Очень умная книга" description="Some smart book idk fr. I love this stupid book" variant="big"/>
                 </View>
             </View>
-            {/*<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "position"} >*/}
                 <View style={styles.actionsContainer}>
-
-
-                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Editor")}>
+                    <TouchableOpacity style={styles.button} onPress={handleCreateBook}>
                         <Text style={styles.buttonText}>✎</Text>
                     </TouchableOpacity>
-                    {/*<TextInput style={styles.input}></TextInput>*/}
                 </View>
-            {/*</KeyboardAvoidingView>*/}
         </SafeAreaView>
     );
 }
@@ -99,6 +110,20 @@ const styles = StyleSheet.create({
     },
     cardsFlatListContent: {
         gap: 14,
+    },
+
+    emptyListContent: {
+        flexGrow: 1,
+        justifyContent: "center",
+    },
+
+    cardsEmptyWrap: {
+        flex: 1,
+        margin: 10,
+        borderRadius: 15,
+        backgroundColor: "#d5d5d5",
+        alignItems: "center",
+        justifyContent: "center",
     },
 
     bigCardWrap: {
