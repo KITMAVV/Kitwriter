@@ -3,9 +3,6 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    TextInput,
-    KeyboardAvoidingView,
-    Platform,
     FlatList,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -13,30 +10,87 @@ import React, {useEffect, useState} from "react";
 
 import BookCard from "../components/Cards";
 import { getAllBooks, createBook } from "../repositories/booksRepository";
-
+import { createChapter } from "../repositories/chaptersRepository";
 
 
 export default function Home({navigation}) {
     
     const [books, setBooks] = useState([]);
 
+    function giveBookName() {
+
+        let baseExists = false;
+        const numbers = [];
+
+        for(const book of books) {
+            const name = book.book_name
+
+            if ( name === "Документ") {
+                baseExists = true;
+            } else if ( name.startsWith("Документ ")) {
+                const parts = name.split(" ");
+                const numberText = parts[1];
+                const number = Number(numberText);
+
+                if ( !Number.isNaN(number) ) {
+                    numbers.push(number);
+                }
+                
+            }
+        }
+
+        if ( baseExists === false) {
+            return "Документ";
+        }
+        
+        if ( numbers.length === 0 ){
+            return "Документ 1";
+        }
+
+        const maxNumber = Math.max(...numbers);
+        return "Документ " + (maxNumber + 1);
+    }
+
+
     async function loadBooks() {
         const data = await getAllBooks();
-            setBooks(data);
-            console.log(data);
-    }
+        setBooks(data);
+        // try {
+        //     const data = await getAllBooks();
+        //     setBooks(data);
+        // } catch (error) {
+        //     console.error("Books load error ----->", error);
+        // }
+        // init race. При первом запуске база не успевает создаться(а юзефект вполне). Легко фиксануть, просто передавая true из App. Но ща можно тупо забить, ведь ошибка только на первом старте проги ...(*￣０￣)ノ
+    };
 
     useEffect(() =>{
         loadBooks();
     }, []);
 
     
+    
 
     async function handleCreateBook() {
+
+        const uniqueName = giveBookName();
+        
         const book = await createBook({
-            book_name: "Без Названия"
+            book_name: uniqueName,
         });
+
+        const chapter = await createChapter({
+            book_id: book.id,
+            title: "",
+            content_md: ""
+        });
+
         await loadBooks();
+
+        navigation.navigate("Editor", {
+            bookId: book.id,
+            chapterId: chapter.id,
+        });
     }
 
     
@@ -176,3 +230,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 });
+
+
+// Дальше делай скрин едитора(написание, сохранение).
