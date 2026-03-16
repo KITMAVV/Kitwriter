@@ -1,6 +1,8 @@
 // chaptersRepository.js
 import { run, query, get, transaction} from "../db/database";
 
+import { touchBookActivity } from "./booksRepository";
+
 /**
  * Структура таблицы chapters:
  *  id           INTEGER PRIMARY KEY
@@ -94,6 +96,7 @@ export async function createChapter(data) {
     });
 
     if (!newChapterId) return null;
+    await touchBookActivity(book_id, updatedAt);
     return await getChapterById(newChapterId);
 }
 
@@ -151,12 +154,14 @@ export async function getChaptersByBookId(bookId, options = {}) {
  * Возвращает обновлённую главу или null, если ничего не обновлено.
  */
 export async function updateChapter(id, fields) {
+    const existing = await getChapterById(id, { includeDeleted: true });
+    if (!existing) return null;
+
     if (!fields || Object.keys(fields).length === 0) {
         return await getChapterById(id);
     }
 
     const allowedFields = [
-        "book_id",
         "title",
         "content_md",
         "order_index",
@@ -199,6 +204,7 @@ export async function updateChapter(id, fields) {
     const { rowsAffected } = await run(sql, params);
     if (rowsAffected === 0) return null;
 
+    await touchBookActivity(existing.book_id);
     return await getChapterById(id, { includeDeleted: true });
 }
 
@@ -223,9 +229,19 @@ export async function restoreChapter(id) {
  * Возвращает true/false.
  */
 export async function deleteChapterHard(id) {
+    const existing = await getChapterById(id, { includeDeleted: true });
+
+    if (!existing) return false;
+
     const sql = `DELETE FROM chapters WHERE id = ?`;
     const { rowsAffected } = await run(sql, [id]);
-    return rowsAffected > 0;
+
+    if (rowsAffected > 0) {
+        await touchBookActivity(existing.book_id);
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -253,7 +269,8 @@ export async function reorderChapters(bookId, newOrderIds) {
             );
         }
     });
-
+    
+    await touchBookActivity(bookId);
     return await getChaptersByBookId(bookId);
 }
 

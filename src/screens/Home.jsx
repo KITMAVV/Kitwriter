@@ -9,13 +9,14 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import React, {useEffect, useState} from "react";
 
 import BookCard from "../components/Cards";
-import { getAllBooks, createBook } from "../repositories/booksRepository";
+import { getAllBooks, createBook, getLastActiveBook } from "../repositories/booksRepository";
 import { createChapter } from "../repositories/chaptersRepository";
 
 
 export default function Home({navigation}) {
     
     const [books, setBooks] = useState([]);
+    const [lastActiveBook, setLastActiveBook] = useState(null);
 
     function giveBookName() {
 
@@ -64,8 +65,15 @@ export default function Home({navigation}) {
         // init race. При первом запуске база не успевает создаться(а юзефект вполне). Легко фиксануть, просто передавая true из App. Но ща можно тупо забить, ведь ошибка только на первом старте проги ...(*￣０￣)ノ
     };
 
+
+    async function loadLastActiveBook() {
+        const data = await getLastActiveBook();
+        setLastActiveBook(data);
+    }
+
     useEffect(() =>{
         loadBooks();
+        loadLastActiveBook();
     }, []);
 
     
@@ -81,14 +89,14 @@ export default function Home({navigation}) {
 
         const chapter = await createChapter({
             book_id: book.id,
-            title: "",
+            title: "Глава 1",
             content_md: ""
         });
 
         await loadBooks();
+        await loadLastActiveBook();
 
         navigation.navigate("Editor", {
-            bookId: book.id,
             chapterId: chapter.id,
         });
     }
@@ -118,7 +126,7 @@ export default function Home({navigation}) {
                         ListEmptyComponent={
                             <View style={styles.cardsEmptyWrap}>
                                 <Text>
-                                    Начните творить сейчас
+                                    ㄟ( ▔, ▔ )ㄏ
                                 </Text>
                             </View>
                         }
@@ -127,7 +135,19 @@ export default function Home({navigation}) {
 
                 <Text style={styles.title}>Продолжить работу</Text>
                 <View style={styles.bigCardWrap}>
-                    <BookCard title="Очень умная книга" description="Some smart book idk fr. I love this stupid book" variant="big"/>
+                    {lastActiveBook ? (
+                        <BookCard
+                            title={lastActiveBook.book_name}
+                            description={lastActiveBook.description}
+                            imgUri={lastActiveBook.cover_image}
+                            variant="big"
+                            onPress={() => console.log("Continue book", lastActiveBook)}
+                        />
+                    ) : (
+                        <View style={styles.bigCardWrap}>
+                            <Text>Начните творить сейчас</Text>
+                        </View>
+                    )}
                 </View>
             </View>
                 <View style={styles.actionsContainer}>
@@ -181,9 +201,11 @@ const styles = StyleSheet.create({
     },
 
     bigCardWrap: {
-
+        backgroundColor: "#e8e8e8",
+        borderRadius: 15,
         alignItems: "center",
-        height: 300,
+        justifyContent: "center",
+        height: 285,
     },
 
     actionsContainer: {

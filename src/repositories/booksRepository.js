@@ -8,6 +8,7 @@ import { run, query, get} from "../db/database";
  * description        TEXT
  * created_at         TEXT (ISO-строка)
  * updated_at         TEXT (ISO-строка)
+ * last_activity_at   TEXT (ISO-строка)
  * target_word_count  INTEGER
  * cover_image        TEXT
  */
@@ -34,6 +35,7 @@ export async function createBook(data) {
 
     const createdAt = nowIso();
     const updatedAt = createdAt;
+    const lastActivityAt = createdAt;
 
     const sql = `
     INSERT INTO books (
@@ -41,10 +43,11 @@ export async function createBook(data) {
       description,
       created_at,
       updated_at,
+      last_activity_at,
       target_word_count,
       cover_image
     )
-    VALUES (?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
     const params = [
@@ -52,6 +55,7 @@ export async function createBook(data) {
         description,
         createdAt,
         updatedAt,
+        lastActivityAt,
         target_word_count,
         cover_image,
     ];
@@ -89,6 +93,23 @@ export async function getAllBooks() {
     const result = await query(sql);
     // query возвращает { rows: { _array, length, item(i) } }
     return result.rows._array;
+}
+
+/**
+ * Получить книгу, над которой работали последней.
+ * Учитывается реальная работа над содержанием (главы),
+ * НЕ ИЗМЕНЕНИЕ МЕТАДАННЫХ!
+ * 
+ * Возвращает объект книги или null.
+ */
+export async function getLastActiveBook() {
+    const sql = `
+      SELECT *
+      FROM books
+      ORDER BY last_activity_at DESC
+      LIMIT 1
+    `;
+    return await get(sql);
 }
 
 /**
@@ -158,6 +179,17 @@ export async function deleteBook(id) {
     return rowsAffected > 0;
 }
 
+//  Дает возможность обновить последнюю активность из Chapters
+export async function touchBookActivity(bookId, timestamp = nowIso()) {
+    const sql = `
+      UPDATE books
+      SET last_activity_at = ?
+      WHERE id = ?
+    `;
+    const { rowsAffected } = await run(sql, [timestamp, bookId]);
+    return rowsAffected > 0;
+}
+
 /**
  * (Опционально) Быстрый поиск по части названия.
  * Возвращает массив книг.
@@ -180,9 +212,11 @@ const booksRepository = {
     getBookById,
     getBookByName,
     getAllBooks,
+    getLastActiveBook,
     updateBook,
     deleteBook,
     searchBooksByName,
+    touchBookActivity,
 };
 
 export default booksRepository;

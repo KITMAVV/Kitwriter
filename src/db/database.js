@@ -105,6 +105,7 @@ export async function initDb() {
       description TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
+      last_activity_at TEXT NOT NULL,
       target_word_count INTEGER,
       cover_image TEXT
     );

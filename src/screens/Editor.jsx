@@ -1,10 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {View, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 
 import PrimaryButton from "../components/PrimaryButton";
 
-export default function Editor() {
+import { getChapterById } from "../repositories/chaptersRepository";
+import { getBookById } from "../repositories/booksRepository";
+
+export default function Editor({ route }) {
+
+    const { chapterId } = route.params;
+    const [ chapter, setChapter ] = useState(null);
+    const [ book, setBook ] = useState(null);
+    
+
+    useEffect(() =>{
+
+        async function loadBook(bookId) {
+            const data = await getBookById(bookId);
+            setBook(data);
+            console.log(data?.book_name);
+        }
+        
+        async function loadChapter() {
+            const data = await getChapterById(chapterId);
+            setChapter(data);
+            console.log(data.id);
+
+            if (data?.book_id) {
+                await loadBook(data.book_id);
+            }
+        }
+
+        loadChapter();
+
+    }, [chapterId]);
+
+
+    
+
+
+
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView  style={styles.keyboardWrapper} behavior={Platform.OS === "ios" ? "padding" : "height"} >
@@ -15,8 +51,8 @@ export default function Editor() {
                                 <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={() => console.log("Go back")}/>
 
                                 <View>
-                                    <Text style={styles.title}>Крутая книга</Text>
-                                    <Text style={styles.subtitle}>Глава 3: крутость но тупость</Text>
+                                    <Text style={styles.title}>{book?.book_name}</Text>
+                                    <Text style={styles.subtitle}>{chapter?.title}</Text>
                                     <Text style={styles.infoTitle}>12 слов | До цели: 200 слов</Text>
                                 </View>
                             </View>
