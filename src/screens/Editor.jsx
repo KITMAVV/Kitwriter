@@ -4,13 +4,14 @@ import {SafeAreaView} from "react-native-safe-area-context";
 
 import PrimaryButton from "../components/PrimaryButton";
 
-import { getChapterById } from "../repositories/chaptersRepository";
+import { getChapterById, updateChapter } from "../repositories/chaptersRepository";
 import { getBookById } from "../repositories/booksRepository";
 
 export default function Editor({ route }) {
 
     const { chapterId } = route.params;
     const [ chapter, setChapter ] = useState(null);
+    const [ text, setText ] = useState("");
     const [ book, setBook ] = useState(null);
     
 
@@ -25,6 +26,7 @@ export default function Editor({ route }) {
         async function loadChapter() {
             const data = await getChapterById(chapterId);
             setChapter(data);
+            setText(data.content_md)
             console.log(data.id);
 
             if (data?.book_id) {
@@ -37,8 +39,10 @@ export default function Editor({ route }) {
     }, [chapterId]);
 
 
-    
-
+    async function saveText() {
+        await updateChapter(chapterId, { content_md: text });
+        console.log("Upd succsfl --- DELETE THIS LINE PLS ");
+    }
 
 
     return (
@@ -48,7 +52,7 @@ export default function Editor({ route }) {
                     <View style={styles.content}>
                         <View style={styles.headerContent}>
                             <View style={styles.headerLeft}>
-                                <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={() => console.log("Go back")}/>
+                                <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={saveText}/>
 
                                 <View>
                                     <Text style={styles.title}>{book?.book_name}</Text>
@@ -64,7 +68,7 @@ export default function Editor({ route }) {
 
 
 
-                        <TextInput placeholder="Начните творить здесь..." multiline textAlignVertical="top" style={styles.input}></TextInput>
+                        <TextInput placeholder="Начните творить здесь..." multiline textAlignVertical="top" style={styles.input} value={text} onChangeText={setText}></TextInput>
 
                         <View style={styles.actionsContainer}>
                             <PrimaryButton btnText={"↶"} onPress={() => console.log("Fuc")}/>

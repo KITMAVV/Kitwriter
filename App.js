@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Home from "./src/screens/Home";
 import Editor from "./src/screens/Editor";
+import ChapterList from "./src/screens/ChaptersList";
 
 import { initDb } from "./src/db/database";
 
@@ -31,6 +32,7 @@ export default function App() {
             <Stack.Navigator id="root" screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="Editor" component={Editor} />
+                <Stack.Screen name="ChapterList" component={ChapterList} />
             </Stack.Navigator>
         </NavigationContainer>
     );

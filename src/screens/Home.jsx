@@ -102,7 +102,12 @@ export default function Home({navigation}) {
     }
 
     
-
+    async function handleOpenBook(bookId) {
+        console.log(bookId);
+        navigation.navigate("ChapterList", {
+            bookId: bookId,
+        });
+    }
 
 
     return (
@@ -118,7 +123,7 @@ export default function Home({navigation}) {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({item}) => (
                             <BookCard title={item.book_name} description={item.description} imgUri={item.cover_image}
-                                      onPress={() => console.log("Opening file", item)}/>
+                                      onPress={() => handleOpenBook(item.id)}/>
                         )}
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={[styles.cardsFlatListContent,  books.length === 0 && styles.emptyListContent]}
@@ -141,7 +146,7 @@ export default function Home({navigation}) {
                             description={lastActiveBook.description}
                             imgUri={lastActiveBook.cover_image}
                             variant="big"
-                            onPress={() => console.log("Continue book", lastActiveBook)}
+                            onPress={() => handleOpenBook(lastActiveBook.id)}
                         />
                     ) : (
                         <View style={styles.bigCardWrap}>
@@ -252,6 +257,3 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 });
-
-
-// Дальше делай скрин едитора(написание, сохранение).
