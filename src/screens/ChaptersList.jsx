@@ -6,61 +6,87 @@ import {
     FlatList,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useState} from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 import ListCard from "../components/ListCard";
+import PrimaryButton from "../components/PrimaryButton";
+
+import { getChaptersByBookId, createChapter } from "../repositories/chaptersRepository";
+import { getBookById } from "../repositories/booksRepository";
+
+import generateUniqueName from "../utils/nameUtils";
 
 
-
-const chapters = [
-    {
-        id: "1",
-        chapter_name: "Глава 1",
-        chapter_content: "Дуже цікава цікава ікаік цікава",
-    },
-    {
-        id: "2",
-        chapter_name: "Глава 2",
-        chapter_content: "Не дуже цікава",
-    },
-    {
-        id: "3",
-        chapter_name: "Глава 3",
-        chapter_content: "Не цікава",
-    },
-    {
-        id: "4",
-        chapter_name: "Глава 3",
-        chapter_content: "Не цікава",
-    },
-    {
-        id: "5",
-        chapter_name: "Глава 1",
-        chapter_content: "Дуже цікава цікава ікаік цікава",
-    },
-    {
-        id: "6",
-        chapter_name: "Глава 2",
-        chapter_content: "Не дуже цікава",
-    },
-    {
-        id: "7",
-        chapter_name: "Глава 3",
-        chapter_content: "Не цікава",
-    },
-    {
-        id: "8",
-        chapter_name: "Глава 3",
-        chapter_content: "Не цікава",
-    },
-];
-
-
-export default function ChapterList({navigation}) {
+export default function ChapterList({ navigation, route }) {
     
+    const { bookId } = route.params;
+    const [ chapters, setChapters ] = useState([]);
+    const [ bookInfo, setBookInfo ] = useState(null);
+
+    const [isDeleteMode, setIsDeleteMode] = useState(false);
+    const [isDragMode, setIsDragMode] = useState(false);
+
+    async function loadChapters(){
+        const data = await getChaptersByBookId(bookId);
+        setChapters(data);
+    }
+
+    async function loadBookInfo(){
+        const data = await getBookById(bookId);
+        setBookInfo(data);
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+           
+            loadChapters();
+            loadBookInfo();
+
+        }, [bookId])
+    );
     
+
+    async function handleCreateChapter() {
+        const uniqueName = generateUniqueName(chapters, "title", "Глава", true);
+
+        const chapter = await createChapter({
+            book_id: bookId,
+            title: uniqueName,
+            content_md: ""
+        });
+
+       
+
+        navigation.navigate("Editor", {
+            chapterId: chapter.id,
+        });
+    }
+    
+    async function handleOpenChapter(chapterId) {
+
+        navigation.navigate("Editor", {
+            chapterId: chapterId,
+        });
+
+    }
+
+
+
     return (
         <SafeAreaView style={styles.container}>
+
+            <View style={styles.Toolbar}>
+                <View style={styles.leftTools}>
+                    <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={null}/>
+                    <Text style={styles.title}>{bookInfo?.book_name}</Text>
+                </View>
+
+                <PrimaryButton btnText={"⇄"} btnWidth={"12%"} onPress={null}/>
+                <PrimaryButton btnText={"..."} variant={"menu-burger"} menuItems={[{ label: 'Сменить порядок Глав', onPress: () => setIsDragMode(prev => !prev) }, { label: 'Экспорт книги .docs', onPress: () => console.log('Бургер docs') }, { label: 'Удалить главу', onPress: () => setIsDeleteMode(prev => !prev) }, { label: 'Задать цель по словам', onPress: () => console.log('Бургер цель') },]} btnWidth={"11%"} onPress={() => console.log("Хембургер")}/>
+                
+            </View>
+
             <View style={styles.listContainer}>
                 <View style={styles.listFlatListWrap}>
                                     <FlatList
@@ -68,7 +94,8 @@ export default function ChapterList({navigation}) {
                                         showsVerticalScrollIndicator={false}
                                         keyExtractor={(item) => item.id.toString()}
                                         renderItem={({item}) => (
-                                            <ListCard title={item.chapter_name} content={item.chapter_content}></ListCard>
+                                            <ListCard title={item.title} content={item.preview} showDrag={isDragMode} showDelete={isDeleteMode}
+                                            onPress={() => handleOpenChapter(item.id)}></ListCard>
                                         )}
                                         
                                         contentContainerStyle={[styles.listFlatListContent,  chapters.length === 0 && styles.emptyListContent]}
@@ -85,7 +112,7 @@ export default function ChapterList({navigation}) {
 
             </View>
             <View style={styles.actionsContainer}>
-                <TouchableOpacity style={styles.button} onPress={ () => console.log("New Chaptr")}>
+                <TouchableOpacity style={styles.button} onPress={handleCreateChapter}>
                     <Text style={styles.buttonText}>New Chapter</Text>
                 </TouchableOpacity>
             </View>
@@ -109,6 +136,23 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         justifyContent: "center",
+    },
+    Toolbar: {
+       height: 55,
+       padding: 5,
+       flexDirection: "row",
+       justifyContent: "space-between",
+    },
+    leftTools:{
+        flex: 1,
+        flexDirection: "row",
+        gap: 10,
+        alignItems: "center",
+    },
+    title: {                        // Нужно предусмотреть на случай если title слишком длинный
+        fontSize: 24,
+        fontWeight: "bold",
+        marginBottom: 3,
     },
     listContainer: {
         backgroundColor: "#d5d5d5",
@@ -139,7 +183,7 @@ const styles = StyleSheet.create({
     listFlatListWrap: {
         backgroundColor: "#e8e8e8",
         borderRadius: 15,
-        height: "auto",
+        
         overflow: "hidden",
         marginBottom: 15,
 
@@ -161,8 +205,3 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 });
-
-
-
-// Дальше настраивай елементы списка(List Card), и допили все елементы ChapterList(кнопки сверху). Подключать в конец! 
-// Кстати, тому кто это читает - приветики:)

@@ -57,7 +57,7 @@ export default function Editor({ route }) {
                                 <View>
                                     <Text style={styles.title}>{book?.book_name}</Text>
                                     <Text style={styles.subtitle}>{chapter?.title}</Text>
-                                    <Text style={styles.infoTitle}>12 слов | До цели: 200 слов</Text>
+                                    <Text style={styles.infoTitle}>12 слов | Ожидаемо: 200 слов</Text>
                                 </View>
                             </View>
 

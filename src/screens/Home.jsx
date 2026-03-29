@@ -12,45 +12,12 @@ import BookCard from "../components/Cards";
 import { getAllBooks, createBook, getLastActiveBook } from "../repositories/booksRepository";
 import { createChapter } from "../repositories/chaptersRepository";
 
+import generateUniqueName from "../utils/nameUtils";
 
 export default function Home({navigation}) {
     
     const [books, setBooks] = useState([]);
     const [lastActiveBook, setLastActiveBook] = useState(null);
-
-    function giveBookName() {
-
-        let baseExists = false;
-        const numbers = [];
-
-        for(const book of books) {
-            const name = book.book_name
-
-            if ( name === "Документ") {
-                baseExists = true;
-            } else if ( name.startsWith("Документ ")) {
-                const parts = name.split(" ");
-                const numberText = parts[1];
-                const number = Number(numberText);
-
-                if ( !Number.isNaN(number) ) {
-                    numbers.push(number);
-                }
-                
-            }
-        }
-
-        if ( baseExists === false) {
-            return "Документ";
-        }
-        
-        if ( numbers.length === 0 ){
-            return "Документ 1";
-        }
-
-        const maxNumber = Math.max(...numbers);
-        return "Документ " + (maxNumber + 1);
-    }
 
 
     async function loadBooks() {
@@ -81,7 +48,7 @@ export default function Home({navigation}) {
 
     async function handleCreateBook() {
 
-        const uniqueName = giveBookName();
+        const uniqueName = generateUniqueName(books, "book_name", "Документ");
         
         const book = await createBook({
             book_name: uniqueName,

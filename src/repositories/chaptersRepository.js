@@ -120,16 +120,25 @@ export async function getChapterById(id, options = {}) {
 /**
  * Получить все главы книги.
  * options: { includeDeleted?: boolean }
+ * !!!вместо полного текста главы возвращает обрезаный preview
  * Возвращает массив глав, отсортированных по order_index ASC.
  */
 export async function getChaptersByBookId(bookId, options = {}) {
     const { includeDeleted = false } = options;
 
     let sql = `
-    SELECT *
-    FROM chapters
-    WHERE book_id = ?
-  `;
+        SELECT
+            id,
+            book_id,
+            title,
+            word_count,
+            order_index,
+            created_at,
+            updated_at,
+            substr(content_md, 1, 50) AS preview
+        FROM chapters
+        WHERE book_id = ?
+    `;
     const params = [bookId];
 
     if (!includeDeleted) {
@@ -139,7 +148,13 @@ export async function getChaptersByBookId(bookId, options = {}) {
     sql += ` ORDER BY order_index ASC, created_at ASC`;
 
     const result = await query(sql, params);
-    return result.rows._array;
+
+    return result.rows._array.map((chapter) => ({
+        ...chapter,
+        preview: chapter.preview
+            ? chapter.preview.replace(/\n/g, " ").trim()
+            : "",
+    }));
 }
 
 /**
