@@ -12,7 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import ListCard from "../components/ListCard";
 import PrimaryButton from "../components/PrimaryButton";
 
-import { getChaptersByBookId, createChapter } from "../repositories/chaptersRepository";
+import { getChaptersByBookId, createChapter, updateChapter } from "../repositories/chaptersRepository";
 import { getBookById } from "../repositories/booksRepository";
 
 import generateUniqueName from "../utils/nameUtils";
@@ -26,6 +26,8 @@ export default function ChapterList({ navigation, route }) {
 
     const [isDeleteMode, setIsDeleteMode] = useState(false);
     const [isDragMode, setIsDragMode] = useState(false);
+    const [isReversed, setIsReversed] = useState(false);
+    
 
     async function loadChapters(){
         const data = await getChaptersByBookId(bookId);
@@ -71,14 +73,35 @@ export default function ChapterList({ navigation, route }) {
 
     }
 
+   async function handleRenameChapter(chapterId, newTitle) {
+    const trimmed = newTitle.trim();
 
+    if (!trimmed) return;
+
+    await updateChapter(chapterId, {
+        title: trimmed,
+    });
+
+    await loadChapters();
+    }
+
+
+    function handleBack() {
+        navigation.goBack();
+    }
+
+
+    function toggleReverse() {
+        setIsReversed(prev => !prev);
+    }
+    
 
     return (
         <SafeAreaView style={styles.container}>
 
             <View style={styles.Toolbar}>
                 <View style={styles.leftTools}>
-                    <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={null}/>
+                    <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={handleBack}/>
                     <Text style={styles.title}>{bookInfo?.book_name}</Text>
                 </View>
 
@@ -87,15 +110,18 @@ export default function ChapterList({ navigation, route }) {
                 
             </View>
 
-            <View style={styles.listContainer}>
+
+
+            <View style={[ styles.listContainer, isReversed && { justifyContent: "flex-end" } ]}>
                 <View style={styles.listFlatListWrap}>
                                     <FlatList
                                         data={chapters}
+                                        inverted={isReversed}
                                         showsVerticalScrollIndicator={false}
                                         keyExtractor={(item) => item.id.toString()}
                                         renderItem={({item}) => (
                                             <ListCard title={item.title} content={item.preview} showDrag={isDragMode} showDelete={isDeleteMode}
-                                            onPress={() => handleOpenChapter(item.id)}></ListCard>
+                                            onPress={() => handleOpenChapter(item.id)} onEditPress={(newTitle) => handleRenameChapter(item.id, newTitle)}></ListCard>
                                         )}
                                         
                                         contentContainerStyle={[styles.listFlatListContent,  chapters.length === 0 && styles.emptyListContent]}
@@ -109,12 +135,17 @@ export default function ChapterList({ navigation, route }) {
                                         }
                                     />
                                 </View>
-
+                            
             </View>
+
+            
             <View style={styles.actionsContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleCreateChapter}>
                     <Text style={styles.buttonText}>New Chapter</Text>
                 </TouchableOpacity>
+                
+                {/*  Кнопка для одной руки, инвертирует список глав и тащит весь список вниз*/}
+                <PrimaryButton btnText={"⇅"} btnWidth={"15%"} onPress={toggleReverse}/>
             </View>
         </SafeAreaView>
     );
@@ -156,10 +187,12 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         backgroundColor: "#d5d5d5",
+        
         padding: 20,
         gap: 10,
         flex: 1,
         borderRadius: 15,
+        
 
     },
     button: {

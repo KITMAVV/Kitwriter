@@ -7,27 +7,34 @@ import PrimaryButton from "../components/PrimaryButton";
 import { getChapterById, updateChapter } from "../repositories/chaptersRepository";
 import { getBookById } from "../repositories/booksRepository";
 
-export default function Editor({ route }) {
+import countWords from "../utils/countWords";
+import useChapterAutosave from "../hooks/useChapterAutosave";
+
+export default function Editor({ route, navigation }) {
 
     const { chapterId } = route.params;
     const [ chapter, setChapter ] = useState(null);
     const [ text, setText ] = useState("");
     const [ book, setBook ] = useState(null);
     
+    const [hasUserEdited, setHasUserEdited] = useState(false);
+
+    useChapterAutosave(chapterId, text, hasUserEdited);
 
     useEffect(() =>{
 
         async function loadBook(bookId) {
             const data = await getBookById(bookId);
             setBook(data);
-            console.log(data?.book_name);
+            console.log('Book Name: ', data?.book_name);
         }
         
         async function loadChapter() {
             const data = await getChapterById(chapterId);
             setChapter(data);
             setText(data.content_md)
-            console.log(data.id);
+            setHasUserEdited(false);
+            console.log('Chapter ID: ', data.id);
 
             if (data?.book_id) {
                 await loadBook(data.book_id);
@@ -39,9 +46,16 @@ export default function Editor({ route }) {
     }, [chapterId]);
 
 
+    function handleTextChange(value) {
+        setText(value);
+        setHasUserEdited(true);
+    }
+
+
+    // РУЧНОЙ СЕЙВ КНОПКИ. Стоит также добавить сейв при уходе жестом/кнопочкой назад
     async function saveText() {
         await updateChapter(chapterId, { content_md: text });
-        console.log("Upd succsfl --- DELETE THIS LINE PLS ");
+        navigation.goBack();
     }
 
 
@@ -57,7 +71,7 @@ export default function Editor({ route }) {
                                 <View>
                                     <Text style={styles.title}>{book?.book_name}</Text>
                                     <Text style={styles.subtitle}>{chapter?.title}</Text>
-                                    <Text style={styles.infoTitle}>12 слов | Ожидаемо: 200 слов</Text>
+                                    <Text style={styles.infoTitle}>{countWords(text)} слов | Ожидаемо: 200 слов</Text>
                                 </View>
                             </View>
 
@@ -68,15 +82,15 @@ export default function Editor({ route }) {
 
 
 
-                        <TextInput placeholder="Начните творить здесь..." multiline textAlignVertical="top" style={styles.input} value={text} onChangeText={setText}></TextInput>
+                        <TextInput placeholder="Начните творить здесь..." multiline textAlignVertical="top" style={styles.input} value={text} onChangeText={handleTextChange}></TextInput>
 
                         <View style={styles.actionsContainer}>
-                            <PrimaryButton btnText={"↶"} onPress={() => console.log("Fuc")}/>
-                            <PrimaryButton btnText={"↷"} onPress={() => console.log("Fuc")}/>
-                            <PrimaryButton btnText={"B"} onPress={() => console.log("Fuc")}/>
-                            <PrimaryButton btnText={"I"} onPress={() => console.log("Fuc")}/>
+                            <PrimaryButton btnText={"↶"} onPress={() => console.log("Undo")}/>
+                            <PrimaryButton btnText={"↷"} onPress={() => console.log("Redo")}/>
+                            <PrimaryButton btnText={"B"} onPress={() => console.log("Bold")}/>
+                            <PrimaryButton btnText={"I"} onPress={() => console.log("Italy")}/>
 
-                            <PrimaryButton btnText={"—“Quote“"} onPress={() => console.log("Fuc")}/>
+                            <PrimaryButton btnText={"—“Quote“"} onPress={() => console.log("Quote")}/>
 
                         </View>
                     </View>
@@ -110,11 +124,11 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         margin: 12,
-        letterSpacing: 1,
-        fontSize: 12,
+        letterSpacing: 0.5,
+        fontSize: 11,
         borderColor: "#f8f8f8",
         borderWidth: 1,
-        padding: 10,
+        padding: 28,
         backgroundColor: "#ffffff",
     },
 

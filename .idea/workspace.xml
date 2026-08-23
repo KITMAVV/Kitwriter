@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bd058d26-40c3-4bf1-a223-bed0112373c2" name="Changes" comment="GG_v0.2.0 Editor Wireframe&#10;&#10;- Finished wireframe for the Editor screen&#10;- New type for PrimaryButton - menu-burger">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ListCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ListCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/ChaptersList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/ChaptersList.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/Editor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Editor.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Home.jsx" afterDir="false" />
     </list>
@@ -102,6 +101,7 @@
       <workItem from="1765314582672" duration="177000" />
       <workItem from="1773490810035" duration="2009000" />
       <workItem from="1773517808245" duration="6000" />
+      <workItem from="1780932986827" duration="12000" />
     </task>
     <task id="LOCAL-00001" summary="GG_v0.1.0 Home Wireframe, Editor, Buttons&#10;&#10;- Added wireframe for the Home screen&#10;- Started building the Editor screen layout&#10;- Implemented a multi-variant button component">
       <option name="closed" value="true" />

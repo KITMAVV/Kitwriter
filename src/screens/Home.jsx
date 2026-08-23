@@ -63,14 +63,19 @@ export default function Home({navigation}) {
         await loadBooks();
         await loadLastActiveBook();
 
-        navigation.navigate("Editor", {
-            chapterId: chapter.id,
-        });
+        navigation.reset({
+            index: 2,
+            routes: [
+                { name: "Home" },
+                { name: "ChapterList", params: { bookId: book.id } },
+                { name: "Editor", params: { chapterId: chapter.id } },
+            ]
+        })
     }
 
     
     async function handleOpenBook(bookId) {
-        console.log(bookId);
+        console.log('Opening Book with ID:', bookId);
         navigation.navigate("ChapterList", {
             bookId: bookId,
         });

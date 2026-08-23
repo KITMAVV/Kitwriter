@@ -1,7 +1,26 @@
-import {StyleSheet, Text, Pressable, View} from "react-native";
+import {StyleSheet, Text, Pressable, View, TextInput} from "react-native";
+
+import React, { useState } from "react";
 
 export default function ListCard({ title, content, onPress, onCommentPress, onEditPress, onDeletePress, showDrag = false, showDelete = false }) {
     
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(title);
+
+    function handleSave() {
+        const trimmed = editTitle.trim();
+
+        if (!trimmed) {
+            setIsEditing(false);
+            setEditTitle(title);
+            return;
+        }
+
+        onEditPress(trimmed);
+        setIsEditing(false);
+    }
+
+
     return(
         <Pressable style={styles.card} onPress={onPress}>
             <View style={styles.dragContainer}>
@@ -9,7 +28,19 @@ export default function ListCard({ title, content, onPress, onCommentPress, onEd
             </View>
             
             <View style={styles.infoContainer}>
+                {isEditing ? (
+                <TextInput
+                    value={editTitle}
+                    onChangeText={setEditTitle}
+                    style={styles.titleInput}
+                    autoFocus
+                    onBlur={handleSave}
+                />
+                ) : (
                 <Text style={styles.title}>{title}</Text>
+                )}
+
+
                 {content ? (
                     <Text style={styles.contentText} numberOfLines={1} ellipsizeMode="tail">{content.replace(/\n/g, " ")}</Text>
                 ) : null }
@@ -22,8 +53,18 @@ export default function ListCard({ title, content, onPress, onCommentPress, onEd
                     <Text>💬</Text>
                 </Pressable>
 
-                <Pressable onPress={onEditPress} style={styles.actionBtn}>
-                    <Text>✎</Text>
+
+
+                <Pressable onPress={() => {
+                    if (isEditing) {
+                        handleSave();
+                    } else {
+                        setEditTitle(title);
+                        setIsEditing(true);
+                    }
+                }} style={styles.actionBtn}>
+                    {isEditing ? <Text>✔</Text> : <Text>✎</Text>}
+                    
                 </Pressable>
 
                 {showDelete && (
@@ -55,6 +96,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         marginBottom: 4,
+    },
+    titleInput: {
+        fontSize: 16,
+        fontWeight: "600",
+        marginBottom: 4,
+        padding: 0,
     },
     contentText: {
         fontSize: 12,
