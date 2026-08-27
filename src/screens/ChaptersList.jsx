@@ -63,6 +63,7 @@ export default function ChapterList({ navigation, route }) {
         navigation.navigate("Editor", {
             chapterId: chapter.id,
         });
+        console.log(chapter);
     }
     
     async function handleOpenChapter(chapterId) {
