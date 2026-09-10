@@ -1,11 +1,35 @@
-import {StyleSheet, Text, Pressable, View, TextInput} from "react-native";
+import {
+    StyleSheet,
+    Text,
+    Pressable,
+    View,
+    TextInput,
+} from "react-native";
 
 import React, { useState } from "react";
+import Checkbox from "./Checkbox";
 
-export default function ListCard({ title, content, onPress, onCommentPress, onEditPress, onDeletePress, showDrag = false, showDelete = false }) {
-    
+export default function ListCard({
+    title,
+    content,
+    onPress,
+    onCommentPress,
+    onEditPress,
+    onDeletePress,
+    onTrashRestorePress,
+    mode = "default",
+    onDrag,
+    isSelected = false,
+    onSelectPress,
+}) {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(title);
+
+    const isDefault = mode === "default";
+    const isDrag = mode === "drag";
+    const isDelete = mode === "delete";
+    const isTrash = mode === "trash";
+
 
     function handleSave() {
         const trimmed = editTitle.trim();
@@ -20,60 +44,90 @@ export default function ListCard({ title, content, onPress, onCommentPress, onEd
         setIsEditing(false);
     }
 
-
-    return(
-        <Pressable style={styles.card} onPress={onPress}>
-            <View style={styles.dragContainer}>
-                {showDrag && <Text>|||</Text>}
+    return (
+        <Pressable
+            style={styles.card}
+            onPress={ isDrag ? undefined : isTrash ? onSelectPress : onPress }
+            onLongPress={isDrag ? onDrag : undefined}
+            delayLongPress={200}
+        >
+            <View style={styles.leadingContainer}>
+                {isDrag && <Text>|||</Text>}
+                {isTrash && <Checkbox isSelected={isSelected} />}
             </View>
-            
+
             <View style={styles.infoContainer}>
                 {isEditing ? (
-                <TextInput
-                    value={editTitle}
-                    onChangeText={setEditTitle}
-                    style={styles.titleInput}
-                    autoFocus
-                    onBlur={handleSave}
-                />
+                    <TextInput
+                        value={editTitle}
+                        onChangeText={setEditTitle}
+                        style={styles.titleInput}
+                        autoFocus
+                        onBlur={handleSave}
+                    />
                 ) : (
-                <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.title}>{title}</Text>
                 )}
 
-
                 {content ? (
-                    <Text style={styles.contentText} numberOfLines={1} ellipsizeMode="tail">{content.replace(/\n/g, " ")}</Text>
-                ) : null }
+                    <Text
+                        style={styles.contentText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {content.replace(/\n/g, " ")}
+                    </Text>
+                ) : null}
             </View>
 
-
             {/* Actions */}
+
             <View style={styles.actionContainer}>
-                <Pressable onPress={onCommentPress} style={styles.actionBtn}>
-                    <Text>💬</Text>
-                </Pressable>
+                {isDefault && (
+                    <>
+                        <Pressable
+                            onPress={onCommentPress}
+                            style={styles.actionBtn}
+                        >
+                            <Text>💬</Text>
+                        </Pressable>
 
+                        <Pressable
+                            onPress={() => {
+                                if (isEditing) {
+                                    handleSave();
+                                } else {
+                                    setEditTitle(title);
+                                    setIsEditing(true);
+                                }
+                            }}
+                            style={styles.actionBtn}
+                        >
+                            {isEditing ? <Text>✔</Text> : <Text>✎</Text>}
+                        </Pressable>
+                    </>
+                )}
 
-
-                <Pressable onPress={() => {
-                    if (isEditing) {
-                        handleSave();
-                    } else {
-                        setEditTitle(title);
-                        setIsEditing(true);
-                    }
-                }} style={styles.actionBtn}>
-                    {isEditing ? <Text>✔</Text> : <Text>✎</Text>}
-                    
-                </Pressable>
-
-                {showDelete && (
-                    <Pressable onPress={onDeletePress} style={styles.actionBtn}>
+                {isDelete && (
+                    <Pressable
+                        onPress={onDeletePress}
+                        style={styles.actionBtn}
+                    >
                         <Text>🗑️</Text>
                     </Pressable>
                 )}
-            </View>
 
+                {isTrash && (
+                    <Pressable
+                        onPress={onTrashRestorePress}
+                        style={styles.actionBtn}
+                    >
+                        <Text>↺</Text>
+                    </Pressable>
+                )}
+
+                
+            </View>
         </Pressable>
     );
 }
@@ -85,45 +139,49 @@ const styles = StyleSheet.create({
         padding: 10,
         width: "auto",
         flexDirection: "row",
-        
         alignItems: "center",
         gap: 6,
-        
         minHeight: 80,
+        marginBottom: 14,
     },
-    
+
     title: {
         fontSize: 16,
         fontWeight: "600",
         marginBottom: 4,
     },
+
     titleInput: {
         fontSize: 16,
         fontWeight: "600",
         marginBottom: 4,
         padding: 0,
     },
+
     contentText: {
         fontSize: 12,
         color: "#6e6e6e",
     },
+
     infoContainer: {
         flex: 1,
         flexShrink: 1,
         marginRight: 20,
     },
+
     actionContainer: {
         flexDirection: "row",
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
         gap: 10,
         alignItems: "center",
     },
-    
-    dragContainer: {
+
+    leadingContainer: {
         width: 30,
         alignItems: "center",
         justifyContent: "center",
     },
+
     actionBtn: {
         paddingHorizontal: 10,
         paddingVertical: 8,
@@ -132,4 +190,4 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#a1a1a1",
     },
-})
+});

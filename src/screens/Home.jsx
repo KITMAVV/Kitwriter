@@ -6,7 +6,8 @@ import {
     FlatList,
 } from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useState} from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 import BookCard from "../components/Cards";
 import { getAllBooks, createBook, getLastActiveBook } from "../repositories/booksRepository";
@@ -38,10 +39,12 @@ export default function Home({navigation}) {
         setLastActiveBook(data);
     }
 
-    useEffect(() =>{
+    useFocusEffect(
+    useCallback(() => {
         loadBooks();
         loadLastActiveBook();
-    }, []);
+    }, [])
+);
 
     
     

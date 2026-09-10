@@ -66,12 +66,24 @@ export default function Editor({ route, navigation }) {
                     <View style={styles.content}>
                         <View style={styles.headerContent}>
                             <View style={styles.headerLeft}>
-                                <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={saveText}/>
+                                <PrimaryButton
+                                    btnText={"<--"}
+                                    btnWidth={45}
+                                    onPress={saveText}
+                                />
 
-                                <View>
-                                    <Text style={styles.title}>{book?.book_name}</Text>
-                                    <Text style={styles.subtitle}>{chapter?.title}</Text>
-                                    <Text style={styles.infoTitle}>{countWords(text)} слов | Ожидаемо: 200 слов</Text>
+                                <View style={styles.headerText}>
+                                    <Text style={styles.title} numberOfLines={1}>
+                                        {book?.book_name}
+                                    </Text>
+
+                                    <Text style={styles.subtitle} numberOfLines={1}>
+                                        {chapter?.title}
+                                    </Text>
+
+                                    <Text style={styles.infoTitle} numberOfLines={1}>
+                                        {countWords(text)} слов | Ожидаемо: 200 слов
+                                    </Text>
                                 </View>
                             </View>
 
@@ -114,7 +126,7 @@ const styles = StyleSheet.create({
     actionsContainer: {
         flexDirection: "row",
         backgroundColor: "#e6e6e6",
-        height: 60,
+        height: 55,
         borderTopColor: "#c5c5c5",
         borderTopWidth: 1,
         justifyContent: "center",
@@ -123,21 +135,23 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        margin: 12,
-        letterSpacing: 0.5,
-        fontSize: 11,
-        borderColor: "#f8f8f8",
+        margin: 4,
+        letterSpacing: 0.3,
+        fontSize: 12,
+        borderColor: "#ededed",
         borderWidth: 1,
-        padding: 28,
+        paddingHorizontal: 28,
+        paddingTop: 20, // костиль, решиться при  ScrollView
+        paddingBottom: 0,
         backgroundColor: "#ffffff",
     },
 
 
     headerContent: {
-        gap: 10,
-        height: 70,
-        padding: 2,
+        height: 90,
+        padding: 4,
         flexDirection: "row",
+        // backgroundColor: "#ff0",
     },
     headerLeft: {
         flex: 1,
@@ -145,12 +159,18 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 10,
     },
+    headerText: {
+        flex: 1,
+        flexShrink: 1,
+        minWidth: 0,
+    },
     title: {
         fontSize: 19,
         fontWeight: "bold",
         marginBottom: 3,
     },
     subtitle: {
+        
         fontSize: 16,
     },
     infoTitle: {

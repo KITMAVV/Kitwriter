@@ -3,17 +3,22 @@ import {
     View,
     TouchableOpacity,
     Text,
-    FlatList,
 } from "react-native";
+
 import {SafeAreaView} from "react-native-safe-area-context";
 import React, {useCallback, useState} from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import DraggableFlatList from "react-native-draggable-flatlist";
+
+
 
 import ListCard from "../components/ListCard";
 import PrimaryButton from "../components/PrimaryButton";
 
 import { getChaptersByBookId, createChapter, updateChapter } from "../repositories/chaptersRepository";
 import { getBookById } from "../repositories/booksRepository";
+import { reorderChapters } from "../repositories/chaptersRepository";
+import { softDeleteChapter } from "../repositories/chaptersRepository";
 
 import generateUniqueName from "../utils/nameUtils";
 
@@ -24,8 +29,7 @@ export default function ChapterList({ navigation, route }) {
     const [ chapters, setChapters ] = useState([]);
     const [ bookInfo, setBookInfo ] = useState(null);
 
-    const [isDeleteMode, setIsDeleteMode] = useState(false);
-    const [isDragMode, setIsDragMode] = useState(false);
+    const [cardMode, setCardMode] = useState("default");
     const [isReversed, setIsReversed] = useState(false);
     
 
@@ -74,16 +78,28 @@ export default function ChapterList({ navigation, route }) {
 
     }
 
+    function handleOpenTrash() {
+
+        navigation.navigate("Trash", {
+            bookId: bookId,
+        });
+    }
+
    async function handleRenameChapter(chapterId, newTitle) {
-    const trimmed = newTitle.trim();
+        const trimmed = newTitle.trim();
 
-    if (!trimmed) return;
+        if (!trimmed) return;
 
-    await updateChapter(chapterId, {
-        title: trimmed,
-    });
+        await updateChapter(chapterId, {
+            title: trimmed,
+        });
 
-    await loadChapters();
+        await loadChapters();
+    }
+
+    async function handleDeleteChapter(chapterId) {
+        await softDeleteChapter(chapterId);
+        await loadChapters();
     }
 
 
@@ -97,17 +113,22 @@ export default function ChapterList({ navigation, route }) {
     }
     
 
+    async function handleReorder(data) {
+        const chapterIds = data.map(chapter => chapter.id)
+        await reorderChapters(bookId, chapterIds)
+    }
+
     return (
         <SafeAreaView style={styles.container}>
 
             <View style={styles.Toolbar}>
                 <View style={styles.leftTools}>
-                    <PrimaryButton btnText={"<--"} btnWidth={"12%"} onPress={handleBack}/>
+                    <PrimaryButton btnText={"<--"} btnWidth={45} onPress={handleBack}/>
                     <Text style={styles.title}>{bookInfo?.book_name}</Text>
                 </View>
 
                 <PrimaryButton btnText={"⇄"} btnWidth={"12%"} onPress={null}/>
-                <PrimaryButton btnText={"..."} variant={"menu-burger"} menuItems={[{ label: 'Сменить порядок Глав', onPress: () => setIsDragMode(prev => !prev) }, { label: 'Экспорт книги .docs', onPress: () => console.log('Бургер docs') }, { label: 'Удалить главу', onPress: () => setIsDeleteMode(prev => !prev) }, { label: 'Задать цель по словам', onPress: () => console.log('Бургер цель') },]} btnWidth={"11%"} onPress={() => console.log("Хембургер")}/>
+                <PrimaryButton btnText={"..."} variant={"menu-burger"} menuItems={[{ label: 'Сменить порядок Глав', onPress: () => setCardMode(prev => prev === "drag" ? "default" : "drag") }, { label: 'Экспорт книги .docs', onPress: () => console.log('Бургер docs') }, { label: 'Удалить главу', onPress: () => setCardMode(prev => prev === "delete" ? "default" : "delete" ) }, { label: 'Задать цель по словам', onPress: () => console.log('Бургер цель') }, { label: 'Корзина', onPress: handleOpenTrash },]} btnWidth={"11%"} onPress={() => console.log("Хембургер")}/>
                 
             </View>
 
@@ -115,32 +136,43 @@ export default function ChapterList({ navigation, route }) {
 
             <View style={[ styles.listContainer, isReversed && { justifyContent: "flex-end" } ]}>
                 <View style={styles.listFlatListWrap}>
-                                    <FlatList
-                                        data={chapters}
-                                        inverted={isReversed}
-                                        showsVerticalScrollIndicator={false}
-                                        keyExtractor={(item) => item.id.toString()}
-                                        renderItem={({item}) => (
-                                            <ListCard title={item.title} content={item.preview} showDrag={isDragMode} showDelete={isDeleteMode}
-                                            onPress={() => handleOpenChapter(item.id)} onEditPress={(newTitle) => handleRenameChapter(item.id, newTitle)}></ListCard>
-                                        )}
-                                        
-                                        contentContainerStyle={[styles.listFlatListContent,  chapters.length === 0 && styles.emptyListContent]}
-                
-                                        ListEmptyComponent={
-                                            <View style={styles.listEmptyWrap}>
-                                                <Text>
-                                                    ㄟ( ▔, ▔ )ㄏ
-                                                </Text>
-                                            </View>
-                                        }
-                                    />
-                                </View>
+                    {chapters.length === 0 ? (
+                        <View style={styles.listEmptyWrap}>
+                            <Text>ㄟ( ▔, ▔ )ㄏ</Text>
+                        </View>
+                    ) : (
+                        <DraggableFlatList
+                            style={styles.dragList}
+                            data={chapters}
+                            showsVerticalScrollIndicator={false}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item, drag, isActive }) => (
+                                <ListCard
+                                    title={item.title}
+                                    content={item.preview}
+                                    mode={cardMode}
+                                    onDrag={drag}
+                                    onDeletePress={() => handleDeleteChapter(item.id)}
+                                    onPress={() => handleOpenChapter(item.id)}
+                                    onEditPress={(newTitle) =>
+                                        handleRenameChapter(item.id, newTitle)
+                                    }
+                                />
+                            )}
+                            onDragEnd={async ({ data }) => {
+                                setChapters(data);
+                                await handleReorder(data);
+                            }}
+                        />
+                    )}
+                </View>
                             
             </View>
 
             
             <View style={styles.actionsContainer}>
+                
+
                 <TouchableOpacity style={styles.button} onPress={handleCreateChapter}>
                     <Text style={styles.buttonText}>New Chapter</Text>
                 </TouchableOpacity>
@@ -215,21 +247,19 @@ const styles = StyleSheet.create({
 
 
     listFlatListWrap: {
+        flex: 1,
         backgroundColor: "#e8e8e8",
         borderRadius: 15,
         
-        overflow: "hidden",
-        marginBottom: 15,
+        
+        
 
     },
-    listFlatListContent: {
-        gap: 14,
+    dragList: {
+        
+        borderRadius: 15,
     },
 
-    emptyListContent: {
-        flexGrow: 1,
-        justifyContent: "center",
-    },
     listEmptyWrap: {
         flex: 1,
         margin: 10,
