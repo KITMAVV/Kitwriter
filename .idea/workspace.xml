@@ -5,12 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bd058d26-40c3-4bf1-a223-bed0112373c2" name="Changes" comment="GG_v0.2.0 Editor Wireframe&#10;&#10;- Finished wireframe for the Editor screen&#10;- New type for PrimaryButton - menu-burger">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ListCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ListCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Cards.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cards/Cards.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Checkbox.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/Checkbox.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ListCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cards/ListCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/PrimaryButton.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/PrimaryButton.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/useChapterAutosave.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useChapterAutosave.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repositories/booksRepository.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/repositories/booksRepository.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repositories/chaptersRepository.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/repositories/chaptersRepository.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repositories/revisionsRepository.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/repositories/revisionsRepository.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/ChaptersList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/ChaptersList.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/Editor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Editor.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/Trash.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/Trash.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,11 +69,18 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;npm.start.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.general&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2024.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Lenovo\PhpstormProjects\Kitwriter\src\components\editor" />
+      <recent name="C:\Users\Lenovo\PhpstormProjects\Kitwriter\src\components\cards" />
+      <recent name="C:\Users\Lenovo\PhpstormProjects\Kitwriter\src\components\ui" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
@@ -74,8 +93,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PS-253.30387.85" />
-        <option value="bundled-php-predefined-a98d8de5180a-0e0d91225499-com.jetbrains.php.sharedIndexes-PS-253.30387.85" />
+        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-PS-241.15989.102" />
+        <option value="bundled-php-predefined-ba97393d7c68-c76157a7178b-com.jetbrains.php.sharedIndexes-PS-241.15989.102" />
       </set>
     </attachedChunks>
   </component>
@@ -102,6 +121,13 @@
       <workItem from="1773490810035" duration="2009000" />
       <workItem from="1773517808245" duration="6000" />
       <workItem from="1780932986827" duration="12000" />
+      <workItem from="1789926788656" duration="4810000" />
+      <workItem from="1789993133429" duration="2711000" />
+      <workItem from="1790014438512" duration="8152000" />
+      <workItem from="1790104497780" duration="6813000" />
+      <workItem from="1790177433239" duration="17649000" />
+      <workItem from="1790269228005" duration="17990000" />
+      <workItem from="1790330619140" duration="2181000" />
     </task>
     <task id="LOCAL-00001" summary="GG_v0.1.0 Home Wireframe, Editor, Buttons&#10;&#10;- Added wireframe for the Home screen&#10;- Started building the Editor screen layout&#10;- Implemented a multi-variant button component">
       <option name="closed" value="true" />
@@ -124,6 +150,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="GG_v0.1.0 Home Wireframe, Editor, Buttons&#10;&#10;- Added wireframe for the Home screen&#10;- Started building the Editor screen layout&#10;- Implemented a multi-variant button component" />

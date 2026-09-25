@@ -9,14 +9,14 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import React, {useCallback, useState} from "react";
 import { useFocusEffect } from "@react-navigation/native";
 
-import BookCard from "../components/Cards";
+import BookCard from "../components/cards/Cards";
 import { getAllBooks, createBook, getLastActiveBook } from "../repositories/booksRepository";
 import { createChapter } from "../repositories/chaptersRepository";
 
 import generateUniqueName from "../utils/nameUtils";
 
 export default function Home({navigation}) {
-    
+
     const [books, setBooks] = useState([]);
     const [lastActiveBook, setLastActiveBook] = useState(null);
 
@@ -46,13 +46,13 @@ export default function Home({navigation}) {
     }, [])
 );
 
-    
-    
+
+
 
     async function handleCreateBook() {
 
         const uniqueName = generateUniqueName(books, "book_name", "Документ");
-        
+
         const book = await createBook({
             book_name: uniqueName,
         });
@@ -76,7 +76,7 @@ export default function Home({navigation}) {
         })
     }
 
-    
+
     async function handleOpenBook(bookId) {
         console.log('Opening Book with ID:', bookId);
         navigation.navigate("ChapterList", {

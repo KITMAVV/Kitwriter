@@ -1,58 +1,77 @@
-import { useEffect, useRef } from 'react';
-import { updateChapter } from "../repositories/chaptersRepository";
+import { useEffect, useRef, useCallback } from 'react';
+import { updateChapter } from '../repositories/chaptersRepository';
+import { useFocusEffect } from '@react-navigation/native';
 
 function useChapterAutosave(chapterId, text, hasUserEdited) {
+    const savedTextRef = useRef(text);
+    const latestTextRef = useRef(text);
+    const editedRef = useRef(hasUserEdited);
 
-     const savedTextRef = useRef(text);
-     const latestTextRef = useRef(text);
-    
+
+    const saveQueueRef = useRef(Promise.resolve());
 
     useEffect(() => {
         latestTextRef.current = text;
-    }, [text]);
+        editedRef.current = hasUserEdited;
 
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            if (!hasUserEdited) {
-                return;
-            }
-
-            if(savedTextRef.current === text) {
-                return
-            }
-
-            await updateChapter(chapterId, {content_md: text,});
-
+        if (!hasUserEdited) {
             savedTextRef.current = text;
-            console.log('Autosave SAVED')
-        }, 2000);
-        
-        return () => clearTimeout(timer);
+        }
+    }, [text, hasUserEdited]);
 
-    }, [text, chapterId, hasUserEdited]);
+
+    const saveNow = useCallback(() => {
+        const task = saveQueueRef.current
+            .catch(() => {})
+            .then(async () => {
+                if (!editedRef.current) return;
+
+                const textToSave = latestTextRef.current;
+
+                if (savedTextRef.current === textToSave) {
+                    return;
+                }
+
+                await updateChapter(chapterId, {
+                    content_md: textToSave,
+                });
+
+                savedTextRef.current = textToSave;
+
+                console.log('Autosave SAVED');
+            });
+
+        saveQueueRef.current = task;
+
+        return task;
+    }, [chapterId]);
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                void saveNow().catch(console.error);
+            };
+        }, [saveNow])
+    );
 
     useEffect(() => {
-        const interval = setInterval(async () => {
-            if (!hasUserEdited) {
-                return;
-            }
+        const timer = setTimeout(() => {
+            void saveNow().catch(console.error);
+        }, 2000);
 
-            if(savedTextRef.current === latestTextRef.current) {
-                return;
-            }
+        return () => clearTimeout(timer);
+    }, [text, hasUserEdited, saveNow]);
 
-            const textToSave = latestTextRef.current;
-            await updateChapter(chapterId, {content_md: textToSave,});
-            savedTextRef.current = textToSave;
-
-            console.log('5 sec Autosave SAVED')
+    useEffect(() => {
+        const interval = setInterval(() => {
+            void saveNow().catch(console.error);
         }, 5000);
 
         return () => clearInterval(interval);
+    }, [saveNow]);
 
-    }, [chapterId, hasUserEdited]);
+    return saveNow;
 
 }
-
 
 export default useChapterAutosave;

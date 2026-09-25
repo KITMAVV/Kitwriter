@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
 
     menuBurger: {
         position: 'absolute',
-        top: 75,
+        top: 60,
         right: 0,
         padding: 6,
         borderRadius: 20,

@@ -7,7 +7,7 @@ import {
 } from "react-native";
 
 import React, { useState } from "react";
-import Checkbox from "./Checkbox";
+import Checkbox from "../ui/Checkbox";
 
 export default function ListCard({
     title,
@@ -72,7 +72,7 @@ export default function ListCard({
                 {content ? (
                     <Text
                         style={styles.contentText}
-                        numberOfLines={1}
+                        numberOfLines={2}
                         ellipsizeMode="tail"
                     >
                         {content.replace(/\n/g, " ")}
@@ -126,7 +126,7 @@ export default function ListCard({
                     </Pressable>
                 )}
 
-                
+
             </View>
         </Pressable>
     );
@@ -136,13 +136,15 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: "#fff",
         borderRadius: 15,
+        borderColor: "#ededed",
+        borderWidth: 1,
         padding: 10,
         width: "auto",
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
-        minHeight: 80,
-        marginBottom: 14,
+        minHeight: 90,
+        marginBottom: 5,
     },
 
     title: {
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
 
     contentText: {
         fontSize: 12,
+        fontWeight: "300",
         color: "#6e6e6e",
     },
 

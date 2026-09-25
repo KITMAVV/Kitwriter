@@ -12,8 +12,8 @@ import {
 
 import { FlatList } from "react-native-gesture-handler";
 
-import ListCard from "../components/ListCard";
-import PrimaryButton from "../components/PrimaryButton";
+import ListCard from "../components/cards/ListCard";
+import PrimaryButton from "../components/ui/PrimaryButton";
 
 import { getDeletedChaptersByBookId, restoreChapter, deleteChapterHard } from "../repositories/chaptersRepository";
 
@@ -31,9 +31,9 @@ const Trash = ({ navigation, route }) => {
 
     useFocusEffect(
             useCallback(() => {
-               
+
                 loadDeletedChapters();
-    
+
             }, [bookId])
     );
 
@@ -60,7 +60,7 @@ const Trash = ({ navigation, route }) => {
       }
     }
 
-    
+
     async function handleRestore(id) {
         await restoreChapter(id);
         await loadDeletedChapters();
@@ -141,11 +141,11 @@ const Trash = ({ navigation, route }) => {
                                     title={item.title}
                                     content={item.preview}
                                     mode="trash"
-                                    
+
                                     isSelected={selectedIds.includes(item.id)}
                                     onSelectPress={() => handleSelect(item.id)}
                                     onTrashRestorePress={() => handleRestore(item.id)}
-            
+
                                 >
                                 </ListCard>
                             )}
@@ -155,16 +155,16 @@ const Trash = ({ navigation, route }) => {
             </View>
 
             <View style={styles.actionsContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleDeletePress}>
+                <TouchableOpacity style={styles.button} onPress={handleSelectAll}>
                     <Text style={styles.buttonText}>
-                        Delete Selected
+                        Select All
                     </Text>
                 </TouchableOpacity>
 
                 <PrimaryButton
-                    btnText={"Select All"}
+                    btnText={"Delete"}
                     btnWidth={"25%"}
-                    onPress={handleSelectAll}
+                    onPress={handleDeletePress}
                 />
             </View>
         </SafeAreaView>
