@@ -9,7 +9,7 @@ import Home from "./src/screens/Home";
 import Editor from "./src/screens/Editor";
 import ChapterList from "./src/screens/ChaptersList";
 import Trash from "./src/screens/Trash";
-import teststing from "./src/screens/teststing";
+// import teststing from "./src/screens/teststing";
 
 import { initDb } from "./src/db/database";
 
